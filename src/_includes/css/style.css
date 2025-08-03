@@ -1,0 +1,76 @@
+/* TODO: Customize colors, fonts, and spacing. */
+
+:root {
+  /* Colors */
+  --color-text: #333;
+  --color-text-muted: #666;
+  --color-text-light: #222;
+  --color-background: #fff;
+  --color-border: #eee;
+  --color-link: #0066cc;
+  --color-link-hover: #0052a3;
+
+  /* Typography */
+  --font-family-base: system-ui, sans-serif;
+  --font-size-base: 1rem;
+  --line-height-base: 1.6;
+
+  /* Layout */
+  --max-width: 800px;
+  --spacing-xs: 10px;
+  --spacing-sm: 20px;
+  --spacing-md: 40px;
+  --spacing-lg: 60px;
+
+  /* TODO: Customize CSS custom properties for your theme */
+}
+
+body {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--spacing-sm);
+  color: var(--color-text);
+  background-color: var(--color-background);
+  /* TODO: Adjust variables in :root as needed */
+}
+
+nav {
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--color-border);
+  /* TODO: Style navigation to match your design */
+}
+
+nav a {
+  margin-right: var(--spacing-sm);
+  text-decoration: none;
+  color: var(--color-link);
+  /* TODO: Update link colors */
+}
+
+nav a:hover {
+  text-decoration: underline;
+  color: var(--color-link-hover);
+}
+
+h1,
+h2,
+h3 {
+  color: var(--color-text-light);
+  /* TODO: Adjust heading colors and typography */
+}
+
+footer {
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--color-border);
+  text-align: center;
+  color: var(--color-text-muted);
+  /* TODO: Customize footer styling */
+}
+
+/* TODO: Add responsive design rules for mobile devices */
+/* TODO: Add custom styles for your specific content types */

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if title %}{{ title }} | {% endif %}{{ site.title }}</title>
+  <meta name="description" content="{{ description or site.description }}">
+  <link rel="stylesheet" href="/assets/css/main.css">
+</head>
+<body>
+  {% include "components/skip-link.njk" %}
+  
+  <div class="container">
+    {% include "components/header.njk" %}
+
+    <main id="main">
+      {{ content | safe }}
+    </main>
+
+    {% include "components/footer.njk" %}
+  </div>
+  
+  <script src="/assets/js/main.js"></script>
+</body>
+</html>

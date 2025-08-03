@@ -1,0 +1,17 @@
+# TODO: Update navigation items to match your site pages
+items:
+  - text: "Home"
+    href: "/"
+    current: true # TODO: Set current page logic in templates
+  - text: "About"
+    href: "/about/"
+  - text: "Projects"
+    href: "/projects/"
+  - text: "Page"
+    href: "/page/"
+    # TODO: Rename this to match your actual page (e.g., "Projects", "Team", "Services")
+# TODO: Add more navigation items as needed:
+# - text: "Projects"
+#   href: "/projects/"
+# - text: "Contact"
+#   href: "/contact/"

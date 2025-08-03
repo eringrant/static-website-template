@@ -1,0 +1,27 @@
+---
+layout: layouts/base.njk
+title: Projects
+permalink: /projects/
+---
+
+<!-- TODO: Customize the projects page header and description -->
+<h1>{{ title }}</h1>
+<p>Explore our projects and work.</p>
+
+<!-- TODO: Customize how projects are displayed -->
+{% if collections.projects.length > 0 %}
+  {% for project in collections.projects %}
+  <article>
+    <h2><a href="{{ project.url }}">{{ project.data.title }}</a></h2>
+    
+    {% if project.data.description %}
+    <p>{{ project.data.description }}</p>
+    {% endif %}
+    
+    <p><a href="{{ project.url }}">View project →</a></p>
+  </article>
+  {% endfor %}
+{% else %}
+  <!-- TODO: Customize the no projects message -->
+  <p>No projects yet. Check back soon!</p>
+{% endif %}

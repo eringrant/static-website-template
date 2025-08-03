@@ -1,0 +1,22 @@
+:root {
+  /* Colors */
+  --color-text: #333;
+  --color-text-muted: #666;
+  --color-text-light: #222;
+  --color-background: #fff;
+  --color-border: #eee;
+  --color-link: #0066cc;
+  --color-link-hover: #0052a3;
+
+  /* Typography */
+  --font-family-base: system-ui, sans-serif;
+  --font-size-base: 1rem;
+  --line-height-base: 1.6;
+
+  /* Layout */
+  --max-width: 800px;
+  --spacing-xs: 10px;
+  --spacing-sm: 20px;
+  --spacing-md: 40px;
+  --spacing-lg: 60px;
+}

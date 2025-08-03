@@ -1,0 +1,149 @@
+name: check broken links
+
+on:
+  schedule:
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+  push:
+    paths:
+      - "src/**"
+  pull_request:
+    paths:
+      - "src/**"
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  check-links:
+    runs-on: ubuntu-latest
+    name: Check for broken links
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "latest"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install -g linkinator
+
+      - name: Build site
+        run: npm run build
+
+      - name: Install link checker and serve site locally
+        run: |
+          npx @11ty/eleventy --serve --port=8080 &
+          sleep 10
+
+      - name: Check internal links (local build)
+        id: internal-check
+        run: |
+          npx linkinator http://localhost:8080 \
+            --recurse \
+            --verbosity error \
+            --format json \
+            > link-results.json
+
+          # Check if there were any broken links
+          if [ -f link-results.json ]; then
+            BROKEN_COUNT=$(cat link-results.json | jq '.links | map(select(.status >= 400)) | length' 2>/dev/null || echo "0")
+            echo "Found $BROKEN_COUNT broken internal links"
+            
+            if [ "$BROKEN_COUNT" -gt 0 ]; then
+              echo "INTERNAL_LINKS_FAILED=true" >> $GITHUB_OUTPUT
+              echo "Broken links:"
+              cat link-results.json | jq -r '.links | map(select(.status >= 400)) | .[] | "\(.url) [\(.status)]"' 2>/dev/null || echo "Could not parse broken links"
+            else
+              echo "No broken internal links found"
+            fi
+          else
+            echo "INTERNAL_LINKS_FAILED=true" >> $GITHUB_OUTPUT
+            echo "No link results file generated"
+          fi
+
+      - name: Create issue template
+        if: steps.internal-check.outputs.INTERNAL_LINKS_FAILED == 'true'
+        run: |
+          WORKFLOW_FILE=$(echo "${{ github.workflow_ref }}" | sed 's|.*/.github/workflows/||' | sed 's|@.*||')
+          # Generate broken links list with checkboxes and source locations
+          echo "The [${{ github.workflow }} workflow](${{ github.server_url }}/${{ github.repository }}/blob/main/.github/workflows/$WORKFLOW_FILE) has detected broken internal links." >> broken-links-issue.md
+          echo "" >> broken-links-issue.md
+          echo "**Workflow run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> broken-links-issue.md
+          echo "" >> broken-links-issue.md
+          echo "### Broken links" >> broken-links-issue.md
+          echo "" >> broken-links-issue.md
+
+          # Extract broken links with their parent locations
+          cat link-results.json | jq -r '.links | map(select(.status >= 400)) | .[] | "\(.url)|\(.parent)|\(.status)"' | while IFS='|' read -r broken_url parent_url status_code; do
+            # Convert parent URL to relative path for GitHub link
+            parent_path=$(echo "$parent_url" | sed 's|http://localhost:8080||' | sed 's|^/||' | sed 's|/$||')
+            
+            if [ -z "$parent_path" ]; then
+              parent_display="home page"
+              github_link="src/index.njk"
+            else
+              parent_display="$parent_path"
+              # Map common URL patterns to likely source files
+              case "$parent_path" in
+                "publications") github_link="src/pages/publications.njk" ;;
+                "people") github_link="src/pages/people.njk" ;;
+                "research") github_link="src/pages/research.njk" ;;
+                "contact") github_link="src/pages/contact.njk" ;;
+                "join") github_link="src/pages/join.njk" ;;
+                "resources") github_link="src/pages/resources.njk" ;;
+                "news") github_link="src/pages/news.njk" ;;
+                news/*) github_link="src/news/$(basename "$parent_path").md" ;;
+                *) github_link="src/$parent_path" ;;
+              esac
+            fi
+            
+            echo "- [ ] [$broken_url]($broken_url) [$status_code] (via [$parent_display](${{ github.server_url }}/${{ github.repository }}/blob/main/$github_link))" >> broken-links-issue.md
+          done
+
+          echo "" >> broken-links-issue.md
+          echo "### Next steps" >> broken-links-issue.md
+          echo "" >> broken-links-issue.md
+          echo "1. **Fix each broken link above** (and tick the checkbox when fixed)." >> broken-links-issue.md
+          echo "2. **Test the fixes** by re-running the workflow manually." >> broken-links-issue.md
+
+          # Add frontmatter
+          cat > temp-issue.md << 'EOF'
+          ---
+          title: "Broken links detected by linkinator"
+          labels: ['bug', 'links']
+          assignees: ['eringrant']
+          ---
+
+          EOF
+          cat temp-issue.md broken-links-issue.md > final-issue.md
+          mv final-issue.md broken-links-issue.md
+          rm temp-issue.md
+
+      - name: Create issue for broken links
+        if: steps.internal-check.outputs.INTERNAL_LINKS_FAILED == 'true'
+        uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          filename: broken-links-issue.md
+
+      - name: Comment on PR if links broken
+        if: github.event_name == 'pull_request' && (steps.internal-check.outputs.INTERNAL_LINKS_FAILED == 'true')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ **Broken links detected** in this pull request. Please check the workflow logs and fix any broken links before merging.'
+            })
