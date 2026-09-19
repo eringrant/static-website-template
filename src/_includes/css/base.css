@@ -1,21 +1,50 @@
+html {
+  font-size: clamp(1rem, 0.96rem + 0.22vw, 1.125rem);
+}
+
 body {
   font-family: var(--font-family-base);
   font-size: var(--font-size-base);
   line-height: var(--line-height-base);
   color: var(--color-text);
   background-color: var(--color-background);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 h1,
 h2,
 h3 {
   color: var(--color-text-light);
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: clamp(1.75rem, 1.61rem + 0.65vw, 2.25rem);
+}
+
+h2 {
+  font-size: clamp(1.5rem, 1.39rem + 0.54vw, 1.875rem);
+}
+
+h3 {
+  font-size: clamp(1.25rem, 1.18rem + 0.33vw, 1.5rem);
 }
 
 a {
   color: var(--color-link);
+  transition: color 0.2s ease;
 }
 
 a:hover {
   color: var(--color-link-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+  }
 }

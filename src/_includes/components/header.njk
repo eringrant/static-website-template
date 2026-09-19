@@ -2,4 +2,5 @@
   {%- for item in navigation.items %}
   <a href="{{ item.href }}"{% if page.url == item.href %} aria-current="page"{% endif %}>{{ item.text }}</a>
   {%- endfor %}
+  {% include "components/theme-toggle.njk" %}
 </nav>

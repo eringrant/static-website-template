@@ -1,5 +1,5 @@
 :root {
-  /* Colors */
+  /* Colors - Light mode */
   --color-text: #333;
   --color-text-muted: #666;
   --color-text-light: #222;
@@ -19,4 +19,28 @@
   --spacing-sm: 20px;
   --spacing-md: 40px;
   --spacing-lg: 60px;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-text: #e4e4e7;
+    --color-text-muted: #a1a1aa;
+    --color-text-light: #f4f4f5;
+    --color-background: #111827;
+    --color-border: #374151;
+    --color-link: #60a5fa;
+    --color-link-hover: #93c5fd;
+  }
+}
+
+/* Manual dark mode toggle */
+[data-theme="dark"] {
+  --color-text: #e4e4e7;
+  --color-text-muted: #a1a1aa;
+  --color-text-light: #f4f4f5;
+  --color-background: #111827;
+  --color-border: #374151;
+  --color-link: #60a5fa;
+  --color-link-hover: #93c5fd;
 }

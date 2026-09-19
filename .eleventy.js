@@ -9,13 +9,13 @@ export default function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/favicon.ico");
   eleventyConfig.addPassthroughCopy("src/CNAME");
 
+  // TODO: Configure additional file extensions if needed
+  eleventyConfig.addTemplateFormats(["md", "css"]);
+
   // Add collections.
   eleventyConfig.addCollection("projects", function (collectionApi) {
     return collectionApi.getFilteredByGlob("src/projects/*.md");
   });
-
-  // TODO: Configure additional file extensions if needed
-  eleventyConfig.addTemplateFormats(["md", "css"]);
 
   // CSS minification filter
   // https://www.11ty.dev/docs/quicktips/inline-css/
@@ -64,6 +64,30 @@ export default function (eleventyConfig) {
       return Image.default.generateHTML(metadata, imageAttributes);
     },
   );
+
+  // RSS feed filters
+  eleventyConfig.addFilter("dateToRfc822", function (date) {
+    return new Date(date).toUTCString();
+  });
+
+  eleventyConfig.addFilter(
+    "getNewestCollectionItemDate",
+    function (collection) {
+      if (!collection || !collection.length) {
+        return new Date();
+      }
+      return new Date(Math.max(...collection.map((item) => item.date)));
+    },
+  );
+
+  eleventyConfig.addFilter("limit", function (array, limit) {
+    return array.slice(0, limit);
+  });
+
+  eleventyConfig.addFilter("truncate", function (str, length = 200) {
+    if (!str) return "";
+    return str.length > length ? str.substring(0, length) + "..." : str;
+  });
 
   // TODO: Add more custom filters, shortcodes, or collections here.
 
